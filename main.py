@@ -1,2 +1,2 @@
 def menu():
-    print('')
+    print('Banana')
