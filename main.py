@@ -1,3 +1,11 @@
+import csv
+import os
+
+def cadastro_livro():
+    
+
+
+
 def menu():
     while True:
         print('----------|SISTEMA DE BIBLIOTECA|----------')
@@ -8,5 +16,7 @@ def menu():
         print('5 - Buscar livros na biblioteca')
         print('6 - Ordenar livros')
         print('7 - Sair do Sistema')
-        
+        opcao = int(input('Qual a opção deseja escolher?: '))
+        if opcao == 1:
+            cadastro()
 menu()
