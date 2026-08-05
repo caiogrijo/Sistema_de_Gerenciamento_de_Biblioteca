@@ -10,7 +10,17 @@ if not os.path.exists(ARQUIVO):
         escritor.writerow(["Título", "Autor", "Ano", "ISBN", "Status"])
 
 def cadastro_livro():
-    print('Que livro gostaria de cadastrar?: ')
+    titulo = input('Título do livro: ')
+    autor = input('Autor do livro: ')
+    ano = int(input('Ano de publicação: '))
+    isbn = input('Código ISBN do livro: ')
+    status = 'Disponível'
+
+    #Processo de pegar as informações e por na tabela
+    with open(ARQUIVO, "a", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+        escritor.writerow([titulo, autor, ano, isbn, status])
+        print('Livro cadastrado com sucesso!')
 
 
 
@@ -27,4 +37,3 @@ while True:
     opcao = int(input('Qual a opção deseja escolher?: '))
     if opcao == 1:
         cadastro_livro()
-menu()
