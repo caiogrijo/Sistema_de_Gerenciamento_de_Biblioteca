@@ -85,7 +85,16 @@ def devolver():
         escritor.writerows(livros)
 
 def listar():
-    
+    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
+        leitor = csv.reader(arquivo)
+
+        next(leitor)
+
+        print(f"{'Título':30} {'Autor':20} {'Ano':6} {'ISBN':15} {'Status'}")
+        print("-" * 90)
+
+        for livro in leitor:
+            print(f"{livro[0]:30} {livro[1]:20} {livro[2]:6} {livro[3]:15} {livro[4]}")
 
 
 while True:
