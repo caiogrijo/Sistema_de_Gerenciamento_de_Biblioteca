@@ -137,13 +137,6 @@ def ordenar():
         for livro in leitor:
             livros.append(livro)
 
-    def titulo(livro):
-        return livro[0].lower
-    def autor(livro):
-        return livro[1].lower
-    def ano(livro):
-        return int(livro[2])
-
     print("\nComo deseja ordenar?")
     print("1 - Título")
     print("2 - Autor")
@@ -151,13 +144,25 @@ def ordenar():
     opcao = input("Escolha uma opção: ")
 
     if opcao == "1":
-        livros.sort(key=titulo)
+        livros.sort(key=lambda livro: livro[0].lower())
 
     elif opcao == "2":
-        livros.sort(key=autor)
+        livros.sort(key=lambda livro: livro[1].lower())
 
     elif opcao == "3":
-        livros.sort(key=ano)
+        livros.sort(key=lambda livro: int(livro[2]))
+    else:
+        print('OPÇÃO INVÁLIDA!')
+        return
+
+    for livro in livros:
+        print(f"Título: {livro[0]}")
+        print(f"Autor: {livro[1]}")
+        print(f"Ano: {livro[2]}")
+        print(f"ISBN: {livro[3]}")
+        print(f"Status: {livro[4]}")
+        print("-" * 40)
+
 
 while True:
     print('----------|SISTEMA DE BIBLIOTECA|----------')
@@ -182,6 +187,7 @@ while True:
     elif opcao == 6:
         ordenar()
     elif opcao == 7:
-        sair()
+        print('OBRIGADO POR UTILIZAR A BIBLIOTECA!')
+        break
     else:
         print('OPÇÃO INVÁLIDA!')
