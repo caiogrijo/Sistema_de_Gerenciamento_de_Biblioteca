@@ -108,7 +108,7 @@ def buscar():
     encontrado = False
 
     with open(ARQUIVO, 'r', newline='', encoding='utf-8') as arquivo:
-        leitor = csv.readear(arquivo)
+        leitor = csv.reader(arquivo)
         next(leitor) #Pula o cabeçalho
 
         for livro in leitor:
@@ -126,6 +126,38 @@ def buscar():
         if not encontrado:
             print("Livro não encontrado.")
 
+
+def ordenar():
+    livros = []
+
+    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
+        leitor = csv.reader(arquivo)
+        next(leitor)  # Pula o cabeçalho
+
+        for livro in leitor:
+            livros.append(livro)
+
+    def titulo(livro):
+        return livro[0].lower
+    def autor(livro):
+        return livro[1].lower
+    def ano(livro):
+        return int(livro[2])
+
+    print("\nComo deseja ordenar?")
+    print("1 - Título")
+    print("2 - Autor")
+    print("3 - Ano")
+    opcao = input("Escolha uma opção: ")
+
+    if opcao == "1":
+        livros.sort(key=titulo)
+
+    elif opcao == "2":
+        livros.sort(key=autor)
+
+    elif opcao == "3":
+        livros.sort(key=ano)
 
 while True:
     print('----------|SISTEMA DE BIBLIOTECA|----------')
