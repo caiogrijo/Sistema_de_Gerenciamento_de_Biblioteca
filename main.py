@@ -104,7 +104,27 @@ def listar():
             print(f"{livro[0]:30} {livro[1]:20} {livro[2]:6} {livro[3]:15} {livro[4]}")#Print das informações dos livros
 
 def buscar():
-    busca = input('Qual o ISBN do livro que deseja pesquisar?: ')
+    busca = input('Digite o título ou o autor do livro que deseja pesquisar: ').strip().lower()
+    encontrado = False
+
+    with open(ARQUIVO, 'r', newline='', encoding='utf-8') as arquivo:
+        leitor = csv.readear(arquivo)
+        next(leitor) #Pula o cabeçalho
+
+        for livro in leitor:
+            if busca in livro[0].lower() or busca in livro[1].lower():
+                encontrado = True
+
+                print("\n===== LIVRO ENCONTRADO =====")
+                print(f"Título: {livro[0]}")
+                print(f"Autor: {livro[1]}")
+                print(f"Ano: {livro[2]}")
+                print(f"ISBN: {livro[3]}")
+                print(f"Status: {livro[4]}")
+                print("-" * 40)
+
+        if not encontrado:
+            print("Livro não encontrado.")
 
 
 while True:
