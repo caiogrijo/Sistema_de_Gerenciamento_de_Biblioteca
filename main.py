@@ -1,6 +1,5 @@
 import csv
 import os
-livros = []
 
 ARQUIVO = "livros.csv"
 
@@ -9,6 +8,29 @@ if not os.path.exists(ARQUIVO):
     with open(ARQUIVO, "w", newline="", encoding="utf-8") as arquivo:
         escritor = csv.writer(arquivo)
         escritor.writerow(["Título", "Autor", "Ano", "ISBN", "Status"])
+
+
+def carregar_livros():
+    livros = []
+
+    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
+        leitor = csv.reader(arquivo)
+
+        next(leitor)
+
+        for linha in leitor:
+            livro = {
+                "título": linha[0],
+                "autor": linha[1],
+                "ano": int(linha[2]),
+                "isbn": linha[3],
+                "status": linha[4]
+            }
+
+            livros.append(livro)
+
+    return livros
+
 
 def cadastro_livro(livros):
     titulo = input('Título do livro: ')
@@ -29,12 +51,30 @@ def cadastro_livro(livros):
     return livros
 
 
+def salvar_livros(livros):
+    with open(ARQUIVO, "w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+
+        escritor.writerow(["Título", "Autor", "Ano", "ISBN", "Status"])
+
+        for livro in livros:
+            escritor.writerow([
+                livro["título"],
+                livro["autor"],
+                livro["ano"],
+                livro["isbn"],
+                livro["status"]
+            ])
+
+    return True
+
+
 def emprestimo(livros):
     isbn = input('Digite o ISBN do livro que gostaria de pegar emprestado: ')
     encontrado = False
 
     for livro in livros:
-        if livros['isbn'] == isbn: # livro[3] é a posição do ISBN dentro da linha
+        if livro['isbn'] == isbn: # livro[3] é a posição do ISBN dentro da linha
             encontrado = True # marca que achamos o livro procurado
 
             if livro['status'] == "Disponível": # Verifica se o livro está disponível pra empréstimo
@@ -45,125 +85,94 @@ def emprestimo(livros):
                 print("Este livro já está emprestado.")
                 return False
 
-            # Independente de ser o livro procurado ou não,
-            # adiciona a linha na lista para não perder nenhum registro
-        livros.append(livro)
-
     if not encontrado:
         print("Livro não encontrado.")
         return False # sai da função sem reescrever o arquivo (não é necessário)
+    
 
-    # Reabre o arquivo, agora em modo escrita ("w"), o que apaga o conteúdo antigo
-    with open(ARQUIVO, "w", newline="", encoding="utf-8") as arquivo:
-        escritor = csv.writer(arquivo)
-        # Escreve todas as linhas de uma vez (cabeçalho + livros atualizados),
-        # substituindo o arquivo antigo pelo novo, já com o status corrigido
-        escritor.writerows(livros)
-
-
-def devolver():
+def devolver(livros):
     isbn = input('Digite o ISBN do livro que gostaria de devolver: ')
-    livros = []
     encontrado = False
     
-    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
-        leitor = csv.reader(arquivo)
-        cabecalho = next(leitor)
-        livros.append(cabecalho)
+    for livro in livros:
+        if livro['isbn'] == isbn:
+            encontrado = True
     
-        for livro in leitor:
-            if livro[3] == isbn:
-                encontrado = True
-    
-                if livro[4] == "Emprestado":
-                    livro[4] = "Disponível"
-                    print("Livro devolvido com sucesso!")
-                else:
-                    print("Este livro não pode ser devolvido pois não está emprestado.")
-    
-            livros.append(livro)
+            if livro['status'] == "Emprestado":
+                livro['status'] = "Disponível"
+                print("Livro devolvido com sucesso!")
+                return True
+            else:
+                print("Este livro não pode ser devolvido pois não está emprestado.")
+                return False
     
     if not encontrado:
         print("Livro não encontrado.")
-        return
-    
-    with open(ARQUIVO, "w", newline="", encoding="utf-8") as arquivo:
-        escritor = csv.writer(arquivo)
-        escritor.writerows(livros)
+        return False
 
-def listar():
-    #Coloca o arquivo livros.csv em modo de leitura, tranformando ele quase em uma lista
-    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
-        leitor = csv.reader(arquivo)
+def listar(livros):
+    print(f"{'Título':30} {'Autor':20} {'Ano':6} {'ISBN':15} {'Status'}")
+    print("-" * 90)
 
-        next(leitor)
+    for livro in livros:
+        print(f"{livro['título']:30} {livro['autor']:20} {livro['ano']:6} {livro['isbn']:15} {livro['status']}")
+    return True
 
-        print(f"{'Título':30} {'Autor':20} {'Ano':6} {'ISBN':15} {'Status'}") #Define as colunas e o tamanho delas
-        print("-" * 90)
-
-        for livro in leitor:
-            print(f"{livro[0]:30} {livro[1]:20} {livro[2]:6} {livro[3]:15} {livro[4]}")#Print das informações dos livros
-
-def buscar():
+def buscar(livros):
     busca = input('Digite o título ou o autor do livro que deseja pesquisar: ').strip().lower()
     encontrado = False
 
-    with open(ARQUIVO, 'r', newline='', encoding='utf-8') as arquivo:
-        leitor = csv.reader(arquivo)
-        next(leitor) #Pula o cabeçalho
+    for livro in livros:
+        if busca in livro['título'].lower() or busca in livro['autor'].lower():
+            encontrado = True
 
-        for livro in leitor:
-            if busca in livro[0].lower() or busca in livro[1].lower():
-                encontrado = True
+            print("\n===== LIVRO ENCONTRADO =====")
+            print(f"Título: {livro['título']}")
+            print(f"Autor: {livro['autor']}")
+            print(f"Ano: {livro['ano']}")
+            print(f"ISBN: {livro['isbn']}")
+            print(f"Status: {livro['status']}")
+            print("-" * 40)
 
-                print("\n===== LIVRO ENCONTRADO =====")
-                print(f"Título: {livro[0]}")
-                print(f"Autor: {livro[1]}")
-                print(f"Ano: {livro[2]}")
-                print(f"ISBN: {livro[3]}")
-                print(f"Status: {livro[4]}")
-                print("-" * 40)
-
-        if not encontrado:
-            print("Livro não encontrado.")
+    if encontrado:
+        return True
+    else:
+        print("Livro não encontrado.")
+        return False
 
 
-def ordenar():
-    livros = []
-
-    with open(ARQUIVO, "r", newline="", encoding="utf-8") as arquivo:
-        leitor = csv.reader(arquivo)
-        next(leitor)  # Pula o cabeçalho
-
-        for livro in leitor:
-            livros.append(livro)
-
+def ordenar(livros):
     print("\nComo deseja ordenar?")
     print("1 - Título")
     print("2 - Autor")
     print("3 - Ano")
+
     opcao = input("Escolha uma opção: ")
 
     if opcao == "1":
-        livros.sort(key=lambda livro: livro[0].lower())
+        livros.sort(key=lambda livro: livro["título"].lower())
 
     elif opcao == "2":
-        livros.sort(key=lambda livro: livro[1].lower())
+        livros.sort(key=lambda livro: livro["autor"].lower())
 
     elif opcao == "3":
-        livros.sort(key=lambda livro: int(livro[2]))
+        livros.sort(key=lambda livro: livro["ano"])
+
     else:
-        print('OPÇÃO INVÁLIDA!')
-        return
+        print("OPÇÃO INVÁLIDA!")
+        return False
 
     for livro in livros:
-        print(f"Título: {livro[0]}")
-        print(f"Autor: {livro[1]}")
-        print(f"Ano: {livro[2]}")
-        print(f"ISBN: {livro[3]}")
-        print(f"Status: {livro[4]}")
+        print(f"Título: {livro['título']}")
+        print(f"Autor: {livro['autor']}")
+        print(f"Ano: {livro['ano']}")
+        print(f"ISBN: {livro['isbn']}")
+        print(f"Status: {livro['status']}")
         print("-" * 40)
 
+    return True
+
+livros = carregar_livros()
 
 while True:
     print('----------|SISTEMA DE BIBLIOTECA|----------')
@@ -177,16 +186,19 @@ while True:
     opcao = int(input('Qual a opção deseja escolher?: '))
     if opcao == 1:
         livros = cadastro_livro(livros)
+        salvar_livros(livros)
     elif opcao == 2:
-        emprestimo(livros)
+        if emprestimo(livros):
+            salvar_livros(livros)
     elif opcao == 3:
-        devolver()
+        if devolver(livros):
+            salvar_livros(livros)
     elif opcao == 4:
-        listar()
+        listar(livros)
     elif opcao == 5:
-        buscar()
+        buscar(livros)
     elif opcao == 6:
-        ordenar()
+        ordenar(livros)
     elif opcao == 7:
         print('OBRIGADO POR UTILIZAR A BIBLIOTECA!')
         break
